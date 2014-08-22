@@ -1,0 +1,106 @@
+SQL 
+AANMAAK/
+
+-gebruiker
+
+CREATE TABLE gebruiker (
+id INT AUTO_INCREMENT PRIMARY KEY,
+naam VARCHAR(30) NOT NULL,
+usernaam VARCHAR(30) NOT NULL,
+wachtwoord VARCHAR(30) NOT NULL,
+straat VARCHAR(30) NOT NULL,
+huisnummer INT NOT NULL,
+postcode INT NOT NULL,
+postcode_id INT,
+email VARCHAR(30) NOT NULL,
+telefoon VARCHAR(30) NOT NULL,
+promotie BOOL,
+opm_extra VARCHAR(50)
+)
+
+-product
+
+CREATE TABLE product (
+id INT AUTO_INCREMENT PRIMARY KEY,
+naam VARCHAR(30) NOT NULL,
+beschrijving VARCHAR(30) NOT NULL,
+prijs INT NOT NULL,
+korting VARCHAR(30),
+status VARCHAR(30)
+)
+
+-postcode
+
+CREATE TABLE postcode (
+id INT AUTO_INCREMENT PRIMARY KEY,
+postnr INT NOT NULL,
+gemeente VARCHAR(30) NOT NULL,
+kostprijs INT NOT NULL,
+thuis_lev_ok BOOL
+)
+
+-gastenboek
+
+CREATE TABLE gastenboek (
+id INT AUTO_INCREMENT PRIMARY KEY,
+usernaam VARCHAR(30) NOT NULL,
+boodschap VARCHAR(200) NOT NULL,
+dt_aangemaakt DATE
+)
+
+
+-bestelling_dtl
+
+CREATE TABLE bestelling_dtl (
+id INT AUTO_INCREMENT PRIMARY KEY,
+best_id INT,
+product_id INT,
+aantal INT,
+prijs INT,
+korting INT,
+product VARCHAR(30),
+lev_vw VARCHAR (30) NOT NULL,
+bestel_dtl_exta VARCHAR(30)
+)
+
+-bestelling_dtl_extra
+
+CREATE TABLE bestelling_dtl_extra (
+id INT AUTO_INCREMENT PRIMARY KEY,
+best_dtl_id INT,
+product_id INT,
+prijs INT,
+korting INT
+)
+
+-bestelling_hdr
+
+CREATE TABLE bestelling_hdr (
+id INT AUTO_INCREMENT PRIMARY KEY,
+gebr_id INT,
+dt_best DATE,
+thuis_lev BOOL,
+uur_lev TIME,
+status VARCHAR(30),
+extra_kost_lev INT,
+gebr VARCHAR(30)
+)
+
+INVOEREN/
+
+-invoeren postcodes
+
+INSERT INTO postcode (postnr, gemeente, kostprijs, thuis_lev_ok)
+VALUES
+(8500, "Kortrijk", 1, true),
+(8510, "Bellegem", 1, true),
+(8510, "Kooigem", 1, true),
+(8510, "Marke", 1, true),
+(8510, "Rollegem", 1, true),
+(8540, "Deerlijk", 1, true),
+(8550, "Zwevegem", 0, true),
+(8551, "Heestert", 0, true),
+(8552, "Moen", 0, true),
+(8553, "Otegem", 0, true),
+(8554, "Sint-Denijs", 0, true),
+(8580, "Avelgem", 1, true)
