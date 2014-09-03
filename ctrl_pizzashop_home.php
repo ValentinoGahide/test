@@ -38,18 +38,6 @@ if (isset($_GET["action"])) {
         if (isset($_SESSION["best_id"])) {
             unset($_SESSION["best_id"]);
         }
-        //
-        // Check auth_level, if auth_level 0 common user, otherwise admin user
-        //
-        $auth_level = GebruikerinfoService::Get_Gebr_Level($_POST["usernaam"], sha1($_POST["wachtwoord"]));
-        if ($auth_level == 0) {
-            header("location: ctrl_pizzashop_home.php");
-            exit(0);
-        } else {
-            // spring naar controller van beheerdersscherm
-            header("location: ctrl_pizzashop_home_backend.php");
-            exit(0);
-        }
     }
 } else {
     // if error then pass parameter $error to presentation form
@@ -61,4 +49,5 @@ if (isset($_GET["action"])) {
         }
     }
     include("presentation/pizzashop_home.php");
-} 
+}
+    

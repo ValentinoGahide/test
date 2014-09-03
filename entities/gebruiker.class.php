@@ -8,34 +8,32 @@ class Gebruiker {
     private $usernaam;
     private $wachtwoord;
     private $adres;
+    private $postcode;
+    private $postcode_id;
     private $email;
     private $telefoon;
+    private $promotie;
     private $dt_aangemaakt;
-    private $postcode_id;
-    private $postcode;
-    
-    
+    private $opm_extra;
 
-    private function __construct($id, $naam, $usernaam, $wachtwoord, $adres, $email, 
-                                 $telefoon, $dt_aangemaakt, $postcode_id, $postcode) {
+    private function __construct($id, $naam, $usernaam, $wachtwoord, $adres, $postcode, $postcode_id, $email, $telefoon, $promotie, $dt_aangemaakt, $opm_extra) {
         $this->id = $id;
         $this->naam = $naam;
         $this->usernm = $usernaam;
         $this->pasw = $wachtwoord;
-        $this->adres = $adres;
+        $this->straat = $adres;
+        $this->postcode = $postcode;
+        $this->postcode_id = $postcode_id;
         $this->email = $email;
         $this->telefoon = $telefoon;
+        $this->promotie = $promotie;
         $this->dt_aangemaakt = $dt_aangemaakt;
-        $this->postcode_id = $postcode_id;
-        $this->postcode = $postcode;
+        $this->opm_extra = $opm_extra;
     }
 
-    public static function create($id, $naam, $usernaam, $wachtwoord, $adres, $email, 
-                                 $telefoon, $dt_aangemaakt, $postcode_id, $postcode) 
-    {
+    public static function create($id, $naam, $usernaam, $wachtwoord, $adres, $postcode, $postcode_id, $email, $telefoon, $promotie, $dt_aangemaakt, $opm_extra) {
         if (!isset(self::$idMap[$id])) {
-            self::$idMap[$id] = new Gebruiker($id, $naam, $usernaam, $wachtwoord, $adres, $email, 
-                                 $telefoon, $dt_aangemaakt, $postcode_id, $postcode);
+            self::$idMap[$id] = new Gebruiker($id, $naam, $usernaam, $wachtwoord, $adres, $postcode, $postcode_id, $email, $telefoon, $promotie, $dt_aangemaakt, $opm_extra);
         }
         return self::$idMap[$id];
     }
@@ -60,6 +58,14 @@ class Gebruiker {
         return $this->adres;
     }
 
+    public function getPostcode() {
+        return $this->postcode;
+    }
+
+    public function getPostcode_id() {
+        return $this->postcode_id;
+    }
+
     public function getEmail() {
         return $this->email;
     }
@@ -68,52 +74,64 @@ class Gebruiker {
         return $this->telefoon;
     }
 
+    public function getPromotie() {
+        return $this->promotie;
+    }
+
     public function getDt_aangemaakt() {
         return $this->dt_aangemaakt;
     }
 
-    public function getPostcode_id() {
+    public function getOpm_extra() {
+        return $this->opm_extra;
+    }
+
+    public function setId() {
+        return $this->id;
+    }
+
+    public function setNaam() {
+        return $this->naam;
+    }
+
+    public function setUsernaam() {
+        return $this->usernaam;
+    }
+
+    public function setWachtwoord() {
+        return $this->wachtwoord;
+    }
+
+    public function setAdres() {
+        return $this->adres;
+    }
+
+    public function setPostcode() {
+        return $this->postcode;
+    }
+
+    public function setPostcode_id() {
         return $this->postcode_id;
     }
 
-    public function getPostcode() {
-        return $this->postcode;
-    }
-    
-    public function setNaam($naam) {
-        $this->naam = $naam;
+    public function setEmail() {
+        return $this->email;
     }
 
-    public function setUsernm($usernaam) {
-        $this->usernaam = $usernaam;
+    public function setTelefoon() {
+        return $this->telefoon;
     }
 
-    public function setPasw($wachtwoord) {
-        $this->wachtwoord = $wachtwoord;
+    public function setPromotie() {
+        return $this->promotie;
     }
 
-    public function setAdres($adres) {
-        $this->adres = $adres;
+    public function setDt_aangemaakt() {
+        return $this->dt_aangemaakt;
     }
 
-    public function setEmail($email) {
-        $this->email = $email;
-    }
-
-    public function setTelefoon($telefoon) {
-        $this->telefoon = $telefoon;
-    }
-
-    public function setDt_aangemaakt($dt_aangemaakt) {
-        $this->dt_aangemaakt = $dt_aangemaakt;
-    }
-
-    public function setPostcode_id($postcode_id) {
-        $this->postcode_id = $postcode_id;
-    }
-
-    public function setPostcode($postcode) {
-        $this->postcode = $postcode;
+    public function setOpm_extra() {
+        return $this->opm_extra;
     }
 
 }

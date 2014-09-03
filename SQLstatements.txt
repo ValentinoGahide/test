@@ -8,13 +8,13 @@ id INT AUTO_INCREMENT PRIMARY KEY,
 naam VARCHAR(30) NOT NULL,
 usernaam VARCHAR(30) NOT NULL,
 wachtwoord VARCHAR(30) NOT NULL,
-straat VARCHAR(30) NOT NULL,
-huisnummer INT NOT NULL,
+adres VARCHAR(30) NOT NULL,
 postcode INT NOT NULL,
 postcode_id INT,
 email VARCHAR(30) NOT NULL,
 telefoon VARCHAR(30) NOT NULL,
 promotie BOOL,
+dt_aangemaakt DATE,
 opm_extra VARCHAR(50)
 )
 
@@ -26,6 +26,8 @@ naam VARCHAR(30) NOT NULL,
 beschrijving VARCHAR(30) NOT NULL,
 prijs INT NOT NULL,
 korting VARCHAR(30),
+dt_aangemaakt DATE,
+categorie VARCHAR(30),
 status VARCHAR(30)
 )
 
