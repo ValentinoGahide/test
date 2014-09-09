@@ -1,216 +1,141 @@
 <?php
 
 require_once("data/dbconfig.class.php");
-require_once("entities/product.class.php");
+require_once("entities/postcode.class.php");
+require_once("exceptions/gemeenteexception.class.php");
 
-class ProductDAO {
-
+class PostcodeDAO {
     public static function getAll() {
         $lijst = array();
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        $sql = "select id, naam, beschrijving, 
-                       prijs, korting, categorie, status
-                  from producten
-                 order by categorie, naam asc";
-        //$resultSet = $dbh->query($sql);
+        $sql = "select id, postnr, gemeente, kostprijs, thuis_lev_ok
+                  from postcodes order by postnr, gemeente"; 
         $resultSet = $core->dbh->query($sql);
-        foreach ((array)$resultSet as $rij) {
-            $product = Product::create($rij["id"], $rij["naam"], $rij["beschrijving"], $rij["prijs"],
-                                       $rij["korting"], $rij["categorie"], $rij["status"]  );
-            array_push($lijst, $product);
+        foreach ($resultSet as $rij) {
+            $postcode  = Postcode::create($rij["id"], $rij["postnr"], $rij["gemeente"], $rij["kostprijs"], $rij["thuis_lev_ok"]);
+            array_push($lijst, $postcode);
         }
-        $dbh = null;
         return $lijst;
     }
 
-    public static function getAllCat($categorie) {
+    public static function getAll_in_array() {
         $lijst = array();
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        $sql = "select id, naam, beschrijving, 
-                       prijs, korting, categorie, status
-                  from producten
-                where  categorie = " . $categorie .   
-                " and  status = 1 " . 
-                " order by naam asc";
-        //$resultSet = $dbh->query($sql);
+        $sql = "select id, postnr, gemeente, kostprijs, thuis_lev_ok
+                  from postcodes"; 
         $resultSet = $core->dbh->query($sql);
         foreach ((array)$resultSet as $rij) {
-            $product = Product::create($rij["id"], $rij["naam"], $rij["beschrijving"], $rij["prijs"],
-                                       $rij["korting"], $rij["categorie"], $rij["status"]  );
-            array_push($lijst, $product);
+            $lijst [] = array ('gemeente' => $rij["gemeente"], 'id'=> $rij ["id"], 'postnr' => $rij ["postnr"]);
         }
-        $dbh = null;
+        sort ($lijst);
         return $lijst;
-    }
-
+    }    
     public static function getById($id) {
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        $sql = "select id, naam, beschrijving, 
-                       prijs, korting, categorie, status
-                  from producten
+        $sql = "select id, postnr, gemeente, kostprijs, thuis_lev_ok
+                  from postcodes 
                  where id = ". $id;
-        //$resultSet = $dbh->query($sql);
         $resultSet = $core->dbh->query($sql);
         $rij       = $resultSet->fetch();
-        if (isset($rij["id"]))
-          {$product   = Product::create($rij["id"], $rij["naam"], $rij["beschrijving"], $rij["prijs"],
-                                        $rij["korting"], $rij["categorie"], $rij["status"]);}
-        else
-          {throw new ProdBestaatNietException();}
-        $dbh = null;
-        return $product;
+        $postcode  = Postcode::create($rij["id"], $rij["postnr"], $rij["gemeente"], $rij["kostprijs"], $rij["thuis_lev_ok"]);
+        return $postcode;
     }
 
-    public static function getByNaam($naam) {
+    public static function getByGemeente($gemeente, $postnr) {
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        $sql = "select id, naam, beschrijving, 
-                       prijs, korting, categorie, status
-                  from producten
-                 where naam = " . "'" . $naam . "'";
-        //$resultSet = $dbh->query($sql);
+        $sql = "select id, postnr, gemeente, kostprijs, thuis_lev_ok
+                  from postcodes
+                 where gemeente = " . "'" . $gemeente . "'" . 
+                  "and  postnr = ". $postnr;
         $resultSet = $core->dbh->query($sql);
         $rij = $resultSet->fetch();
         if ($rij) {
-            $product   = Product::create($rij["id"], $rij["naam"], $rij["beschrijving"], $rij["prijs"],
-                                     $rij["korting"], $rij["categorie"], $rij["status"]);
-            $dbh = null;
+           $postcode  = Postcode::create($rij["id"], $rij["postnr"], $rij["gemeente"], $rij["kostprijs"], $rij["thuis_lev_ok"]);
         } else {
-            $product = null;
+            $postcode = null;
         }
-        return $product;
+        return $postcode;
     }
-
-    public static function Create($naam, $beschrijving, $prijs, $korting, $categorie, 
-                                  $status) {
-        $bestaand_Prod = self::getByNaam($naam);
-        if (isset ($bestaand_Prod)) throw new ProdBestaatException();
+    
+    public static function Create($postnr, $gemeente, $kostprijs, $thuis_lev_ok) {
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        // get system date and time to store in table 
-        $date=date('y.m.d h:i:s');         
-        $sql = "insert into producten (naam, beschrijving, dt_aangemaakt, prijs, korting, 
-                                       categorie, status) 
-                values ('" . $naam . "','" . $beschrijving . "','" . $date .  "', " . 
-                          $prijs . ", " . $korting . ", " . $categorie . ", " . $status . 
+        $sql = "insert into postcodes (postnr, gemeente, kostprijs, thuis_lev_ok) 
+                values ('" . $postnr . "','" . $gemeente . "', " . $kostprijs .  ", " . 
+                          $thuis_lev_ok . 
                        ")";
                 
         //
-        // Errorchecking before the insert
+        // Errorchecking before the update
         //
-        if ($prijs <0 or $prijs >1000)
-          throw new ProdPrijs_WrongException();
-        if (!is_numeric($prijs))
-          throw new ProdPrijs_WrongException();
-        //        
-        if ($korting <-100 or $korting >100)
-          throw new ProdKorting_WrongException();
-        if (!is_numeric($korting ))
-          throw new ProdKorting_WrongException();
-        //        
-        if ($categorie <0 or $categorie >5)
-          throw new ProdCategorie_WrongException();
-        if (!is_numeric($categorie) )
-          throw new ProdCategorie_WrongException();
-        //        
-        if ($status <0 or $status >1)
-          throw new ProdStatus_WrongException();
-        if (!is_numeric($status) )
-          throw new ProdStatus_WrongException();
-        //        
+        if ($kostprijs <0 or $kostprijs >100)
+          throw new GemeenteKostprijs_WrongException();
+        if (!is_numeric($kostprijs) )
+          throw new GemeenteKostprijs_WrongException();
+        //
+        if ($thuis_lev_ok <0 or $thuis_lev_ok >1)
+          throw new GemeenteThuislev_WrongException();
+        if (!is_numeric($thuis_lev_ok) )
+          throw new GemeenteThuislev_WrongException();
+        //
         $core->dbh->exec($sql);
-        $Prod_Id = $core->dbh->lastInsertId();
-        //$dbh->exec($sql);
-        //$Prod_Id = $dbh->lastInsertId();
-        $dbh = null;
-        $product = Product::create($Prod_Id, $naam, $beschrijving, $prijs, $korting, 
-                                  $categorie, $status); 
-        return $product; 
+        $postcode_Id = $core->dbh->lastInsertId();
+        $postcode = Postcode::create($postcode_Id, $postnr, $gemeente, $kostprijs, $thuis_lev_ok); 
+        return $postcode; 
     }
     
     public static function Delete($id) {
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        $sql = "delete from producten where id = ". $id;
+        $sql = "delete from postcodes where id = ". $id;
         $core->dbh->exec($sql);
-        //$dbh->exec($sql);
-        $dbh = null;
     }
 
-    public static function update($product) {
-        $bestaande_prod = self::getByNaam($product->getNaam() );
-        if (isset ($bestaande_prod) && $bestaande_prod->getId() != $product->getId() )
+    public static function update($postcode) {
+        $bestaande_pc = self::getByGemeente($postcode->getGemeente(), $postcode->getPostnr() );
+        if (isset ($bestaande_pc) && $bestaande_pc->getId() != $postcode->getId() )
         {
-            throw new ProdBestaatException();
+            throw new GemeenteBestaatException();
         }
-        $sql = "update producten set naam='" . $product->getNaam() .
-                "', beschrijving=" . "'" . $product->getBeschrijving() .
-                "', prijs=" . $product->getPrijs() .
-                ", korting=" . $product->getKorting() .
-                ", categorie=" . $product->getCategorie() .
-                ", status=" . $product->getStatus() .
-                ", korting=" . $product->getKorting() .
-                " where id = " . $product->getId();
+        $sql = "update postcodes set gemeente='" . $postcode->getGemeente() .
+                "', postnr=" . $postcode->getPostnr() .
+                ", kostprijs=" . $postcode->getKostprijs() .
+                ", thuis_lev_ok=" . $postcode->getThuis_lev_ok() .
+                " where id = " . $postcode->getId();
+        $core = DBConfig::getInstance();        
+
+        $core->dbh->exec($sql);
         //
         // Errorchecking before the update
         //
-        if ($product->getPrijs() <0 or $product->getPrijs() >1000)
-          throw new ProdPrijs_WrongException();
-        if (!is_numeric($product->getPrijs()) )
-          throw new ProdPrijs_WrongException();
-        //        
-        if ($product->getKorting() <-100 or $product->getKorting() >100)
-          throw new ProdKorting_WrongException();
-        if (!is_numeric($product->getKorting()) )
-          throw new ProdKorting_WrongException();
-        //        
-        if ($product->getCategorie() <0 or $product->getCategorie() >5)
-          throw new ProdCategorie_WrongException();
-        if (!is_numeric($product->getCategorie()) )
-          throw new ProdCategorie_WrongException();
-        //        
-        if ($product->getStatus() <0 or $product->getStatus() >1)
-          throw new ProdStatus_WrongException();
-        if (!is_numeric($product->getStatus()) )
-          throw new ProdStatus_WrongException();
-        //        
-        $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        //$dbh->exec($sql);
-        $core->dbh->exec($sql);
+        if ($postcode->GetKostprijs() <0 or $postcode->getKostprijs() >100)
+          throw new GemeenteKostprijs_WrongException();
+        if (!is_numeric($postcode->getKostprijs()) )
+          throw new GemeenteKostprijs_WrongException();
+        //
+        if ($postcode->getThuis_lev_ok() <0 or $postcode->getThuis_lev_ok() >1)
+          throw new GemeenteThuislev_WrongException();
+        if (!is_numeric($postcode->getThuis_lev_ok()) )
+          throw new GemeenteThuislev_WrongException();
+        //
         $dbh = null;
     }
 
-    public static function Bestaat_product_id($id) {
+    public static function Bestaat_Postnr_Gemeente_al ($postnr, $gemeente) {
         $core = DBConfig::getInstance();        
-        /* $dbh = new PDO(DBConfig::$DB_CONNSTRING,
-                        DBConfig::$DB_USERNAME, DBConfig::$DB_PASSWORD); */
-        $sql = "select id, naam, beschrijving, 
-                       prijs, korting, categorie, status
-                  from producten
-                 where id = ". $id;
-        //$resultSet = $dbh->query($sql);
+
+        $sql = "select id, postnr, gemeente, kostprijs, thuis_lev_ok
+                  from postcodes
+                 where gemeente = " . "'" . $gemeente . "'" . 
+                  " and  postnr = ". $postnr;
         $resultSet = $core->dbh->query($sql);
-        $rij       = $resultSet->fetch();
+        $rij = $resultSet->fetch();
         if ($rij) {
-           $product_bestaat = TRUE;
+           $post_gem_bestaat_al = FALSE;
+           throw new GemeenteBestaatException();
         } else {
-           $product_bestaat = FALSE;
-           throw new ProdBestaatNietException();
+           $post_gem_bestaat_al = FALSE;
         }
-        $dbh = null;
-        return $product_bestaat;
-    }
+        return $post_gem_bestaat_al;
+    }    
 }
 
 ?>
